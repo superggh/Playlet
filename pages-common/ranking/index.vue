@@ -21,12 +21,21 @@
 							<u-image width="215rpx" height="260rpx" radius="5" :src="item.full_img" :lazy-load="true">
 								<view slot="error" style="font-size: 24rpx;">{{$t('加载失败')}}</view>
 							</u-image>
+					 <view class="position-absolute p-1 d-flex a-center item-state top-0 right-0"
+					 	style="background: #00000099;height: 50rpx; border-radius: 20rpx 0 12rpx 0;">
+					 	 
+					 	<view class="text-white font">
+					 		{{item.vid_name}}
+					 	</view>
+					  
+					 </view>
 							<view class="position-absolute p-1 d-flex a-center item-state bottom-0 right-0"
 								style="background: #00000099;height: 50rpx; border-radius: 20rpx 0 12rpx 0;">
 								<u-icon name="play-right-fill" color="#fff" size="14"></u-icon>
 								<view class="text-white font">
 									{{item.sum}}+
 								</view>
+							 
 							</view>
 						</view>
 						<view class="d-flex ml-2 flex-column" style="height: 260rpx;">
@@ -69,25 +78,22 @@
 		},
 		methods: {
 			async getData(e) {
-				let {
-					data,
-					code
-				} = await getRankList(this.query)
-				if (code == 200) {
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
+				this.query.rank = 1
+				this.$getapi("Dj/getList", this.query).then(res => {
+					if (res.code == 0) {
+						this.isLoading = false	
+						if (res.data.list.length == 0 ){
+							this.load = 1
+						}
+						this.list = this.list.concat(res.data.list)
+					 
 					}
-					if (this.query.page * this.query.limit >= data.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
-				}
+				});
+		 
 			},
 			// 下拉刷新
 			onRefresh() {
+				this.list = []
 				this.query.page = 1
 				this.getData()
 			},

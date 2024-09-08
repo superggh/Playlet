@@ -154,7 +154,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "123",
         "setting" : {
             "urlCheck" : true,
             "es6" : true,
@@ -208,9 +208,23 @@
             }
         },
         "title" : "",
-        "devServer" : {
-            "https" : false
-        },
+        "devServer" : {},
+        // "https": false, // 是否启用 https 协议，默认false
+        // "port": 8080, // 本地端口号
+        // "disableHostCheck": true, // 禁用 Host 检查，默认false
+        // "proxy": {
+        // 	// 代理配置
+        // 	"/api": {
+        // 		//本地   http://192.168.0.122:8081
+        // 		"target": "http://api.angula.net/", // 目标接口域名
+        // 		// "target" : "http://121.4.95.214/", // 目标接口域名
+        // 		"changeOrigin": true, // 是否跨域
+        // 		"secure": true, // 是否支持https协议的代理
+        // 		"pathRewrite": {
+        // 			"^/api": "/api"
+        // 		} // 这个一定要加,意思就是把你项目中一dev开头的接口自动替换为 target + pathRewrite第二个参数来进行数据的请求(pathRewrite没有第二个参数的话直接为target)
+        // 	}
+        // }
         "sdkConfigs" : {
             "maps" : {}
         },

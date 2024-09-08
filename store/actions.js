@@ -27,8 +27,9 @@ export default {
 			data,
 			code
 		} = await getLangConfig()
-		if (code == 200) {
+		if (code == 0) {
 			data.forEach((item) => {
+				console.log(item)
 				switch (item.value){
 					case 'zh-cn':
 					item.code = 'zh-Hans'
@@ -41,6 +42,7 @@ export default {
 						break;
 				}
 			})
+			console.log(data)
 			commit('updateLangList', data)
 			uni.setStorageSync('langList', data)
 		}

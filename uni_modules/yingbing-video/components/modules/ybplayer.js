@@ -1,11 +1,12 @@
 (function() {
 	'use strict'
-	function YBPlayer ({container, src, title, poster, formats, barrages, barrageShow, barrageGap, barrageConfig, controls, playShow=true, progressShow=true, timeShow = true, volumeShow=true, settingShow=true, fullscreenShow=true, autoplay, mirror, pictureInPicture, nextBtnShow, prevBtnShow, muted, loop, preload, settings, initialTime, duration, volume, playbackRate, objectFit, crossOrigin, segments, isLive, flvConfig, enableBlob }){
+	function YBPlayer ({container, src, srt, title, poster, formats, barrages, barrageShow, barrageGap, barrageConfig, controls, playShow=true, progressShow=true, timeShow = true, volumeShow=true, settingShow=true, fullscreenShow=true, autoplay, mirror, pictureInPicture, nextBtnShow, prevBtnShow, muted, loop, preload, settings, initialTime, duration, volume, playbackRate, objectFit, crossOrigin, segments, isLive, flvConfig, enableBlob }){
 		if(!(this instanceof YBPlayer)){ //如果this不是指向MyClass
 		    throw new TypeError("TypeError: Class constructor YBPlayer cannot be invoked without 'new'")
 		}
 	   this.container = typeof container == 'string' ? document.getElementById(container) : container
 	   this.src = src || ''
+	   this.srt = srt || ''
 	   this.title = title || ''
 	   this.poster = poster || ''
 	   this.formats = formats || 'auto'
@@ -147,21 +148,37 @@
 	        if(!(this instanceof YBPlayer)){//那么相反 不是正常调用的就是错误的调用
 	           throw new TypeError("TypeError: YBPlayer._initVideo is not a constructor")
 	        }
+
 	        this._videoEl = document.createElement('DIV');
+
+			
 	        this._videoEl.setAttribute('class', 'ybplayer-video-content');
 	        this._wrapperEl.appendChild(this._videoEl);
 	        this.video = document.createElement('VIDEO');
+			let track =  document.createElement("TRACK")
+			track.setAttribute("src",this.srt)
+			console.log('srt',this.srt)
+			track.setAttribute("kind","captions")
+		    track.setAttribute("label","English")
+			track.setAttribute("srclang","en")		  
+		 		 
+		 
+		
+		 
 	        this.video.setAttribute('style', 'width: 100%;height:100%;flex:1;opacity:0;object-fit:' + this.objectFit + ';');
 	        this.video.setAttribute('preload', this.preload);
 	        this.video.setAttribute('playbackRate', this.playbackRate);
 	        this.video.setAttribute('volume', this.volume);
+		    this.video.setAttribute('test', 'test');
 	        this.video.setAttribute('x-webkit-airplay', 'allow');
 	        this.video.setAttribute('webkit-playsinline', true);
 	        this.video.setAttribute('playsinline', true);
 	        this.video.setAttribute('x5-video-player-type', 'h5');
 	        this.video.setAttribute('x5-video-play', true);
 	        this.crossOrigin && this.video.setAttribute('crossOrigin', this.crossOrigin);
-	        this.video.innerHTML = '您的浏览器不支持 video 标签。';
+	        	this.video.appendChild(track) 
+			// this.video.innerHTML = '您的浏览器不支持 video 标签。';
+		
 	        this._videoEl.appendChild(this.video);
 	        this._showPoster()
 	        this.video.muted = this.muted;

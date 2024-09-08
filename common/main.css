@@ -81,7 +81,9 @@ body {
 .bottom-0 {
 	bottom: 0;
 }
-
+.bottom-20 {
+	bottom: 20;
+}
 .bottom-half {
 	bottom: 50%;
 }

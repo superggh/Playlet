@@ -22,13 +22,13 @@ const menuList = [
 		icon: '/static/img/my/menu3.png',
 		page: '/pages-common/about-us/index',
 	},
-	// #ifdef APP-PLUS
+ 
 	{
 		id: 5,
 		name: '当前版本',
 		icon: '/static/img/my/menu6.png'
 	},
-	// #endif
+ 
 	{
 		id: 6,
 		name: '退出登录',

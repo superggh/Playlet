@@ -1,34 +1,40 @@
 <template>
 	<view class="page">
-		<m-navbar :borderBottom="false" :textStyle="$store.state.navbarTextStyle" :bgColor="$store.state.bgColor" i18n value="page.观看历史">
-			<view v-if="list.length != 0" slot="right" class="position-absolute top-half border rounded-1 line-h px-2 py-1" style="right: 20rpx; transform: translateY(-50%);" 
-			:class="isEdit ? 'main-text-color main-border-color' : 'text-white'" @click="isEdit = !isEdit">
+		<m-navbar :borderBottom="false" :textStyle="$store.state.navbarTextStyle" :bgColor="$store.state.bgColor" i18n
+			value="page.观看历史">
+			<view v-if="list.length != 0" slot="right"
+				class="position-absolute top-half border rounded-1 line-h px-2 py-1"
+				style="right: 20rpx; transform: translateY(-50%);"
+				:class="isEdit ? 'main-text-color main-border-color' : 'text-white'" @click="isEdit = !isEdit">
 				{{isEdit ? $t('取消') : $t('编辑')}}
 			</view>
 		</m-navbar>
-		<m-scroll-y isTab :isLoading="isLoading" i18n :scrollStyle="scrollStyle" :load="load"
-			@loadmore="loadmore" bgColor="transparent" @onRefresh="onRefresh">
+		<m-scroll-y isTab :isLoading="isLoading" i18n :scrollStyle="scrollStyle" :load="load" @loadmore="loadmore"
+			bgColor="transparent" @onRefresh="onRefresh">
 			<u-empty class="pt-5" v-if="load != 0 && list.length == 0" mode="list" :text="$t('暂无数据')"
 				icon="/static/img/common/empty.png">
 			</u-empty>
 			<view v-if="list.length != 0" class="list px-2">
-				<view class="item d-flex a-center j-sb rounded mt-2"
-					v-for="(item, i) in list" :key="i" @click="isEdit ? ()=>{return} : itemClick(item)">
-					<u-image radius="6" width="180rpx" height="220rpx" :src="item.videolist.full_img"></u-image>
+				<view class="item d-flex a-center j-sb rounded mt-2" v-for="(item, i) in list" :key="i"
+					@click="isEdit ? ()=>{return} : itemClick(item)">
+					<u-image radius="6" width="180rpx" height="220rpx" :src="item.full_img"></u-image>
 					<view class="item-r ml-2 d-flex flex-1 j-sb flex-column" style="height: 220rpx;">
 						<view class="title text-white text-ellipsis1">
-							{{item.videolist.name}}
+							{{item.name}}
 						</view>
 						<view class="news  main-text-color">
-							{{$t('已观看至')}}：{{item.video.name}}
+							{{$t('已观看至')}}：{{item.video_name}}
 						</view>
 						<view class="desc text-white d-flex a-center">
 							<view class="item-type">
 								<!-- {{item.type}} · {{item.state == 1 ? $t('连载中') : $t('已完结')}} -->
-								{{item.createtime | date('dd/mm/yyyy')}}
+								{{item.ctime}}
 							</view>
-							<view v-if="isEdit" @click.stop="checkClick(item.videolist.id)" class="check-icon d-flex a-center j-center ml-auto" :class="item.check ? 'check-active': ''">
-								<u-image v-if="item.check" width="18" height="18" src="/static/img/common/task.svg"></u-image>
+							<view v-if="isEdit" @click.stop="checkClick(item.id)"
+								class="check-icon d-flex a-center j-center ml-auto"
+								:class="item.check ? 'check-active': ''">
+								<u-image v-if="item.check" width="18" height="18"
+									src="/static/img/common/task.svg"></u-image>
 							</view>
 							<!-- <view v-else-if="!item.is_fav" class="btns ml-auto text-white line-h d-flex a-center j-center" @click.stop="addBookshelf(item)">
 								+ {{$t('page.追剧')}}
@@ -38,7 +44,8 @@
 				</view>
 			</view>
 		</m-scroll-y>
-		<view v-if="isEdit && list.length != 0" class="settlement border-top main-border-color px-3 w-100 position-fixed bottom-0 left-0 d-flex a-center">
+		<view v-if="isEdit && list.length != 0"
+			class="settlement border-top main-border-color px-3 w-100 position-fixed bottom-0 left-0 d-flex a-center">
 			<view class="d-flex a-center" @click="openAllCheck">
 				<view class="check-icon d-flex a-center j-center" :class="allChecked ? 'check-active': ''">
 					<u-image v-if="allChecked" width="18" height="18" src="/static/img/common/task.svg"></u-image>
@@ -81,31 +88,34 @@
 			this.getHistory()
 		},
 		methods: {
-			async getHistory(e) {
-				let {code, data} = await getPlayRecords(this.query)
-				if (code == 200) {
-					if(data.list.length == 0) {
-						this.isEdit = false
-					}else {
-						data.list.forEach((item) => {
-							item.check = false
-						})
+			getHistory() {
+
+				this.$getapi("Dj/getMyViewLog", this.query).then(res => {
+					if (res.code == 0) {
+						this.isLoading = false
+
+						if (res.data.list.length == 0) {
+							this.isEdit = false
+						} else {
+							res.data.list.forEach((item) => {
+								item.check = false
+							})
+						}
+						this.list = this.list.concat(res.data.list)
+						if (this.query.limit > res.data.total) {
+							return this.load = 1
+						} else {
+							return this.load = 0
+						}
 					}
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
-					}
-					if (this.query.page * this.query.limit >= data.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
-				}
+				});
+
+
 			},
 			// 下拉刷新
 			onRefresh() {
 				this.query.page = 1
+				this.list = []
 				this.getHistory()
 			},
 			loadmore() {
@@ -114,7 +124,7 @@
 				this.query.page++
 				this.istrig = false
 				let time = setTimeout(() => {
-					this.getHistory('S')
+					this.getHistory()
 					this.istrig = true
 					clearTimeout(time)
 				}, 1000)
@@ -135,22 +145,23 @@
 			itemClick(i) {
 				let obj = {
 					vid: i.vid,
-					mid: i.video.id
+					mid: i.id
 				}
 				this.$tools.Navigate.navigateTo('/pages-common/detail/index', obj)
 			},
 			// 单选
 			checkClick(i) {
+				console.log(i)
 				let ids = []
 				let bool = true
 				this.list.forEach((item) => {
-					if (item.videolist.id == i) {
+					if (item.id == i) {
 						item.check = !item.check
 					}
 					if (!item.check) {
 						bool = item.check
 					} else {
-						ids.push(item.videolist.id)
+						ids.push(item.id)
 					}
 				})
 				this.allChecked = bool
@@ -158,16 +169,21 @@
 			},
 			// 删除
 			async deleteSubmit(i) {
-				let {code, data} = await delVideoLog({vid: this.ids.join()})
-				if (code == 200) {
-					this.ids = []
-					uni.showToast({
-						icon: 'none',
-						position: 'bottom',
-						title: this.$t("移除成功")
-					});
-					this.onRefresh()
-				}
+
+				let obj = {}
+				obj.ids = this.ids
+				this.$getapi("Dj/delMyHistory", obj).then(res => {
+					if (res.code == 0) {
+						this.ids = []
+						uni.showToast({
+							icon: 'none',
+							position: 'bottom',
+							title: this.$t("移除成功")
+						});
+						this.onRefresh()
+					}
+				})
+
 			},
 			// 全选
 			openAllCheck() {
@@ -175,11 +191,14 @@
 				this.list.forEach((item) => {
 					item.check = this.allChecked
 				})
-				this.allChecked ? this.ids = this.list.map((item)=>item.videolist.id) : this.ids = []
+				this.allChecked ? this.ids = this.list.map((item) => item.id) : this.ids = []
 			},
 			// 加入书架
 			async addBookshelf(i) {
-				let {code, data} = await addNovelShelf({
+				let {
+					code,
+					data
+				} = await addNovelShelf({
 					id: i.id
 				})
 				if (code == 200) {
@@ -204,73 +223,84 @@
 </script>
 
 <style lang="scss" scoped>
-	.tabs{
+	.tabs {
 		height: 80rpx;
 		border-bottom: 1rpx solid #333;
 	}
-	.default{
-		
-	}
-	.active{
+
+	.default {}
+
+	.active {
 		border-color: #EE7623;
 		color: #EE7623;
 	}
-	.page{
-		.item{
-			.item-r{
+
+	.page {
+		.item {
+			.item-r {
 				height: 250rpx;
-				.title{
+
+				.title {
 					font-size: 32rpx;
 				}
-				.news{
+
+				.news {
 					font-size: 28rpx;
 					line-height: 34rpx;
 				}
-				.desc{
+
+				.desc {
 					height: 55rpx;
-					.state{
+
+					.state {
 						font-size: 26rpx;
 					}
-					.btns{
+
+					.btns {
 						border-radius: 10rpx;
 						font-size: 26rpx;
 						padding: 12rpx 22rpx;
 						background-color: #EE7623;
 					}
 				}
+
 				.item-type {
 					color: #eee;
 					font-size: 24rpx;
 				}
-				
+
 				.item-info {
 					color: #FA9C3E;
 					font-size: 28rpx;
 				}
-				
+
 				.item-school {
 					color: #eee;
 					line-height: 32rpx;
 					font-size: 24rpx;
 				}
 			}
-			
+
 		}
-		.settlement{
+
+		.settlement {
 			height: 100rpx;
-			.btn{
+
+			.btn {
 				border-radius: 16rpx;
 				background-color: #EE7623;
 			}
 		}
-		.check-icon{
+
+		.check-icon {
 			width: 45rpx;
 			height: 45rpx;
 			padding: 6rpx;
 			border: 4rpx solid #fff;
 			border-radius: 10rpx;
 		}
-		.check-active{
+
+		.check-active {
 			border: 4rpx solid #EE7623;
 		}
 	}

@@ -365,7 +365,7 @@
 	        }
 			this.config = Object.assign({}, {
 				duration: -1, // 弹幕动画的循环周期，-1 表示不循环播放
-				speed: 150, // 弹幕的运动速度
+				speed: 50, // 弹幕的运动速度
 				fontSize: 24, // 文字大小，单位：像素
 				fontFamily: 'Microsoft Yahei', // 字体，默认值：微软雅黑
 				opacity: 1, // 透明度，有效值 0-1

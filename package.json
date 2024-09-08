@@ -1,64 +1,69 @@
 {
-	"name": "uniapp-tmp",
-	"version": "1.0.0",
-	"description": "<p align=\"center\">     <img alt=\"logo\" src=\"https://gaojianghua.oss-cn-hangzhou.aliyuncs.com/weChatLogo.png\" width=\"120\" height=\"120\" style=\"margin-bottom: 10px;\"> </p> <h3 align=\"center\" style=\"margin: 30px 0 30px;font-weight: bold;font-size:40px;\">UniApp TMP</h3> <h3 align=\"center\">兼容多平台的UniApp骨架模板</h3>",
-	"main": "main.js",
-	"dependencies": {
-		"dayjs": "^1.11.10",
-		"qrcode": "^1.5.3"
-	},
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"uni-app": {
-		"scripts": {
-			"h5-dev": {
-				"title": "H5开发环境",
-				"browser": "chrome",
-				"env": {
-					"UNI_PLATFORM": "h5",
-					"APP_ENV": "Dev"
-				}
-			},
-			"h5-test": {
-				"title": "H5测试环境",
-				"browser": "chrome",
-				"env": {
-					"UNI_PLATFORM": "h5",
-					"APP_ENV": "Test"
-				}
-			},
-			"h5-pro": {
-				"title": "H5正式环境",
-				"browser": "chrome",
-				"env": {
-					"UNI_PLATFORM": "h5",
-					"APP_ENV": "Pro"
-				}
-			},
-			"mpwx-dev": {
-				"title": "MPWX开发环境",
-				"env": {
-					"UNI_PLATFORM": "mp-weixin",
-					"APP_ENV": "Dev"
-				}
-			},
-			"mpwx-test": {
-				"title": "MPWX测试环境",
-				"env": {
-					"UNI_PLATFORM": "mp-weixin",
-					"APP_ENV": "Test"
-				}
-			},
-			"mpwx-pro": {
-				"title": "MPWX正式环境",
-				"env": {
-					"UNI_PLATFORM": "mp-weixin",
-					"APP_ENV": "Pro"
-				}
-			}
-		}
-	},
-	"author": "高江华",
-	"license": "ISC"
+  "name": "uniapp-tmp",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">     <img alt=\"logo\" src=\"https://gaojianghua.oss-cn-hangzhou.aliyuncs.com/weChatLogo.png\" width=\"120\" height=\"120\" style=\"margin-bottom: 10px;\"> </p> <h3 align=\"center\" style=\"margin: 30px 0 30px;font-weight: bold;font-size:40px;\">UniApp TMP</h3> <h3 align=\"center\">兼容多平台的UniApp骨架模板</h3>",
+  "main": "main.js",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dayjs": "^1.11.10",
+    "dijkstrajs": "^1.0.3",
+    "js-md5": "^0.8.3",
+    "qrcode": "^1.5.3",
+    "srt-support-for-html5-videos": "^2.6.11",
+    "subtitles-parser": "^0.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "uni-app": {
+    "scripts": {
+      "h5-dev": {
+        "title": "H5开发环境",
+        "browser": "chrome",
+        "env": {
+          "UNI_PLATFORM": "h5",
+          "APP_ENV": "Dev"
+        }
+      },
+      "h5-test": {
+        "title": "H5测试环境",
+        "browser": "chrome",
+        "env": {
+          "UNI_PLATFORM": "h5",
+          "APP_ENV": "Test"
+        }
+      },
+      "h5-pro": {
+        "title": "H5正式环境",
+        "browser": "chrome",
+        "env": {
+          "UNI_PLATFORM": "h5",
+          "APP_ENV": "Pro"
+        }
+      },
+      "mpwx-dev": {
+        "title": "MPWX开发环境",
+        "env": {
+          "UNI_PLATFORM": "mp-weixin",
+          "APP_ENV": "Dev"
+        }
+      },
+      "mpwx-test": {
+        "title": "MPWX测试环境",
+        "env": {
+          "UNI_PLATFORM": "mp-weixin",
+          "APP_ENV": "Test"
+        }
+      },
+      "mpwx-pro": {
+        "title": "MPWX正式环境",
+        "env": {
+          "UNI_PLATFORM": "mp-weixin",
+          "APP_ENV": "Pro"
+        }
+      }
+    }
+  },
+  "author": "高江华",
+  "license": "ISC"
 }

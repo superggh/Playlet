@@ -1,6 +1,8 @@
 <template>
+
 	<view class="page">
 		<!-- 顶部导航栏 -->
+
 		<m-navbar isTab :borderBottom="false" i18n isSlot>
 			<view class="w-100 d-flex a-center search pl-2 pr-2">
 				<u-image width="212.26rpx" height="56rpx" src="/static/img/common/logo-h.png"></u-image>
@@ -18,7 +20,7 @@
 		<m-scroll-y isTab :isLoading="isLoading" i18n :load="load" :scrollStyle="scrollStyle" @loadmore="loadmore"
 			bgColor="transparent" @onRefresh="onRefresh">
 			<u-swiper bgColor="transparent" :list="swiperList" keyName="src" circular :loading="swiperLoading"
-				@click="swiperClick" radius="0" height="350rpx" imgMode="aspectFill"></u-swiper>
+				@click="swiperClick" radius="0" height="250rpx" imgMode="aspectFill"></u-swiper>
 			<view class="px-3">
 				<view class="d-flex py-3 a-center j-sb">
 					<view class="menu-item d-flex a-center j-center flex-column" v-for="(item, i) in gridList" :key="i"
@@ -42,6 +44,7 @@
 								<u-image width="100%" height="264rpx" radius="5" :src="item.full_img" :lazy-load="true">
 									<view slot="error" style="font-size: 24rpx;">{{$t('加载失败')}}</view>
 								</u-image>
+						
 								<view class="position-absolute p-1 d-flex a-center item-state bottom-0 right-0"
 									style="background: #00000099;height: 50rpx; border-radius: 20rpx 0 12rpx 0;">
 									<u-icon name="play-right-fill" color="#fff" size="14"></u-icon>
@@ -65,6 +68,9 @@
 								<u-image width="100%" height="420rpx" radius="5" :src="item.full_img" :lazy-load="true">
 									<view slot="error" style="font-size: 24rpx;">{{$t('加载失败')}}</view>
 								</u-image>
+								<view class="vid" >
+									{{item.vid_name}}
+								</view>
 								<view class="position-absolute p-1 d-flex a-center item-state bottom-0 right-0"
 									style="background: #00000099;height: 50rpx; border-radius: 20rpx 0 12rpx 0;">
 									<u-icon name="play-right-fill" color="#fff" size="14"></u-icon>
@@ -147,21 +153,25 @@
 					data,
 					code
 				} = await getSwiperList()
-				if (code == 200) {
+				if (code == 0) {
 					this.swiperLoading = false
 					this.swiperList = data
 				}
 			},
 			// 获取流行的
 			async getPopularList() {
+
 				this.isRote = true
-				let {
-					data,
-					code
-				} = await getPopularList()
-				if (code == 200) {
-					this.popularList = data
-				}
+				let obj = {}
+				obj.page = 1
+				this.$getapi("Dj/getPopularList", obj).then(res => {
+					if (res.code == 0) {
+						this.popularList = res.data.list
+					}
+				});
+
+
+
 				let time = setTimeout(() => {
 					this.isRote = false
 					clearTimeout(time)
@@ -169,23 +179,18 @@
 			},
 			// 获取数据
 			async getData(e) {
-				let {
-					data,
-					code
-				} = await getHomeHotList(this.query)
-				if (code == 200) {
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
-						this.total = data.total
+		 
+				this.$getapi("Dj/hotList", this.query).then(res => {
+					if (res.code == 0) {
+						if (res.data.list.length == 0) {
+							this.load =1
+						}
+						 this.list = this.list.concat(res.data.list)
+						 this.total = res.data.total
 					}
-					if (this.query.page * this.query.limit >= this.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
-				}
+				});
+				
+				 
 			},
 			// 下拉刷新
 			onRefresh() {
@@ -317,5 +322,13 @@
 			transform: rotate(720deg);
 		}
 	}
+	}
+	.vid{
+		position: absolute;
+		right:5rpx;
+		top:0rpx;
+		background-color: #888;
+		color:#fff;
+		padding:0rpx 5rpx;
 	}
 </style>

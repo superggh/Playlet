@@ -16,12 +16,12 @@
 								{{amountName(item)}}
 							</view>
 							<view class="info-time text-light-muted">
-								{{item.createtime | date('dd/mm/yyyy')}}
+								{{item.ctime}}
 							</view>
 						</view>
 					</view>
-					<view class="d-flex a-center line-h" :class="item.de_type == 1 ? 'main-text-color' : 'text-light-muted'">
-						{{item.de_type == 1 ? '+' : '-'}}{{item.money}} <u-image width="30rpx" height="30rpx" src="/static/img/my/coin.png"></u-image>
+					<view class="d-flex a-center line-h" :class="item.remark == 1 ? 'main-text-color' : 'text-light-muted'">
+						{{item.de_type == 1 ? '+' : '-'}}{{item.amount}} <u-image width="30rpx" height="30rpx" src="/static/img/my/coin.png"></u-image>
 					</view>
 				</view>
 			</view>
@@ -37,6 +37,7 @@
 		data() {
 			return {
 				load: 0,
+				userinfo:'',
 				isLoading: true,
 				query: {
 					page: 1,
@@ -53,34 +54,34 @@
 			// 初始化
 			init() {
 				this.getData()
+			 
 			},
+		
+				 
 			// 获取数据
 			async getData(e) {
-				let {
-					data,
-					code
-				} = await getWalletDetail(this.query)
-				if (code == 200) {
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
-						this.total = data.total
+				
+				this.$getapi("Dj/getMyMoneyLog", this.query).then(res => {
+					if (res.code == 0) {
+						this.isLoading = false
+						if(res.data.length == 0 ) {
+							this.load =1
+						}
+							this.list = this.list.concat(res.data.list)
+							this.total = res.data.total
 					}
-					if (this.query.page * this.query.limit >= this.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
-				}
+				});
+				 
 			},
 			// 下拉刷新
 			onRefresh() {
 				this.query.page = 1
+				this.list = []
 				this.getData()
 			},
 			// 加载更多
 			loadmore() {
+				
 				if (this.load == 1 || this.istrig == false) return;
 				this.load = 0
 				this.query.page++

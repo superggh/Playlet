@@ -8,12 +8,12 @@ const {
  */
 
 // 获取热门列表
-export const getHomeHotList = (params, config = {}) => http.get('/index/hotList', {
+export const getHomeHotList = (params, config = {}) => http.get('/hotList', {
 	params
 }, config)
 
 // 获取视频详情
-export const getVideoInfo = (params, config = {}) => http.get('/index/videoInfo', {
+export const getVideoInfo = (params, config = {}) => http.get('/videoInfo', {
 	params
 }, config)
 
@@ -63,12 +63,12 @@ export const logout = (params, config = {}) => http.get('/user/logout', {
 }, config)
 
 // 获取轮播图
-export const getSwiperList = (params, config = {}) => http.get('/index/bannerData', {
+export const getSwiperList = (params, config = {}) => http.get('/bannerData', {
 	params
 }, config)
 
 // 获取流行热剧
-export const getPopularList = (params, config = {}) => http.get('/index/newData', {
+export const getPopularList = (params, config = {}) => http.get('/newData', {
 	params
 }, config)
 
@@ -78,7 +78,7 @@ export const getConsumptionList = (params, config = {}) => http.get('/user/myCon
 }, config)
 
 // 获取充值配置信息
-export const getRechargeConfig = (params, config = {}) => http.get('/common/rechargeConfig', {
+export const getRechargeConfig = (params, config = {}) => http.get('/rechargeConfig', {
 	params
 }, config)
 
@@ -88,7 +88,7 @@ export const getVIPConfig = (params, config = {}) => http.get('/common/vipConfig
 }, config)
 
 // 获取推荐视频
-export const getRecommendVideo = (params, config = {}) => http.get('/common/recommend', {
+export const getRecommendVideo = (params, config = {}) => http.get('/getPopularList', {
 	params
 }, config)
 

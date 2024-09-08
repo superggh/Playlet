@@ -9,22 +9,8 @@ export const errorMessage = (res) => {
 		if (data.msg) {
 			str = data.msg
 		} else {
-			str = '呀! 接口开小差啦; 贵客! 骚等哦!'
+			str = 'error request!'
 		}
-		uni.showToast({
-			title: str,
-			icon: 'none',
-			duration: 2000,
-			success: () => {
-				if (str.toLocaleLowerCase().includes('token')) {
-					uni.clearStorageSync()
-					store.commit('updateUserinfo', {})
-					store.commit('updateToken', '')
-					uni.navigateTo({
-						url: '/pages-common/account/login/index'
-					})
-				}
-			}
-		})
+	 
 	}
 }

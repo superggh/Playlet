@@ -11,9 +11,10 @@ class Other {
 	 * @param val 时间戳
 	 */
 	static relativeTime = (val) => {
-		let lang = uni.getStorageSync('lang')
-		lang == 'zh-Hans' ? dayjs.locale('zh-cn') : dayjs.locale('en')
-		return dayjs().to(dayjs(parseInt(val)))
+		return ''
+		// let lang = uni.getStorageSync('lang')
+		// lang == 'zh-Hans' ? dayjs.locale('zh-cn') : dayjs.locale('en')
+		// return dayjs().to(dayjs(parseInt(val)))
 	}
 
 	/**

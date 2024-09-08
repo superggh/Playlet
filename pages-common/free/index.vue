@@ -57,29 +57,25 @@
 			}
 		},
 		onLoad() {
-			this.getData()
+			 this.getData()
 		},
 		methods: {
 			async getData(e) {
-				let {
-					data,
-					code
-				} = await getFreeList(this.query)
-				if (code == 200) {
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
+				this.query.is_free = 1
+				this.$getapi("Dj/getList", this.query).then(res => {
+					if (res.code == 0) {
+						this.isLoading = false	
+						if (res.data.list.length == 0 ){
+							this.load = 1
+						}
+						this.list = this.list.concat(res.data.list)
+					 
 					}
-					if (this.query.page * this.query.limit >= data.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
-				}
+				});
 			},
 			// 下拉刷新
 			onRefresh() {
+				this.list =[ ]
 				this.query.page = 1
 				this.getData()
 			},

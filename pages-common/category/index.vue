@@ -4,7 +4,8 @@
 		<m-navbar :borderBottom="false" i18n isSlot>
 			<view class="w-100 d-flex a-center search pl-10 pr-2">
 				<view class="w-100 position-relative">
-					<view class="position-absolute top-0 right-0 left-0 bottom-0 index-5" @click="$tools.Navigate.navigateTo('/pages-common/search/index')">
+					<view class="position-absolute top-0 right-0 left-0 bottom-0 index-5"
+						@click="$tools.Navigate.navigateTo('/pages-common/search/index')">
 					</view>
 					<!-- 搜索框 -->
 					<u-search bgColor="rgba(255,255,255,0.2)" :placeholder="$t('请输入关键词')" height="60rpx" disabled
@@ -34,7 +35,7 @@
 							style="background: #00000099;height: 50rpx; border-radius: 20rpx 0 12rpx 0;">
 							<u-icon name="play-right-fill" color="#fff" size="14"></u-icon>
 							<view class="text-white font">
-								{{item.sum}}+
+								{{item.vid_name}}
 							</view>
 						</view>
 					</view>
@@ -63,12 +64,13 @@
 				chooseIndex: 0,
 				tabs: [{
 					id: 0,
-					name: this.$t('全部')
+					name: this.$t('全部'),
+					value:'全部'
 				}],
 				query: {
 					page: 1,
 					limit: 20,
-					cate_id: 0
+					keywords: '全部'
 				},
 				itemStyle: {
 					borderRadius: '10rpx',
@@ -85,27 +87,29 @@
 				this.$tools.Navigate.navigateTo('/pages-common/detail/index', i)
 			},
 			changeTab(i) {
+				console.log(i)
 				this.load = 0
 				this.isLoading = true
 				this.list = []
 				this.current = i.index
-				this.query.cate_id = i.id
+				this.query.keywords = i.value
 				this.onRefresh()
 			},
 			async getList(e) {
-				let {code, data} = await getCategoryList(this.query)
-				if (code == 200) {
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
+	 
+				this.$getapi("Dj/getList", this.query).then(res => {
+					if (res.code == 0) {
+						this.isLoading = false	
+						if (res.data.list.length == 0 ){
+							this.load = 1
+						}
+						this.list = this.list.concat(res.data.list)
+					 
 					}
-					if (this.query.page * this.query.limit >= data.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
-				}
+				});
+				
+				
+			 
 			},
 			// 下拉刷新
 			onRefresh() {
@@ -124,19 +128,20 @@
 				}, 1000)
 			},
 			async getTabs() {
-				let {
-					code,
-					data
-				} = await getVideoCategory()
-				if (code == 200) {
-					data.unshift({
-						id: 0,
-						name: this.$t('全部')
-					})
-					this.$store.commit('updateAllType', data)
-					uni.setStorageSync('allType', data)
-					this.getList()
-				}
+
+				this.$getapi("Dj/category", {}).then(res => {
+					if (res.code == 0) {
+						res.data.unshift({
+							id: 0,
+							name: this.$t('全部'),
+							value:'全部'
+						})
+						this.$store.commit('updateAllType', res.data)
+						uni.setStorageSync('allType', res.data)
+						this.getList()
+					}
+				});
+
 			}
 		},
 		computed: {
@@ -168,7 +173,7 @@
 				font-size: 28rpx;
 				font-weight: 500;
 			}
-			
+
 			.item-state {
 				color: #ED6824;
 				font-size: 26rpx;
@@ -179,11 +184,11 @@
 		.lists-item:nth-child(1),
 		.lists-item:nth-child(2),
 		{
-			margin-top: 0 !important;
-		}
-		
-		.lists-item:nth-child(2n) {
-			margin-right: 0 !important;
-		}
+		margin-top: 0 !important;
+	}
+
+	.lists-item:nth-child(2n) {
+		margin-right: 0 !important;
+	}
 	}
 </style>

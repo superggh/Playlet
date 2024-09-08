@@ -9,7 +9,7 @@
 				{{isEdit ? $t('取消') : $t('编辑')}}
 			</view>
 		</m-navbar>
-		<view v-if="!$store.state.token" class="d-flex a-center flex-column j-center" :style="scrollStyle">
+		<view v-if="!has_login" class="d-flex a-center flex-column j-center" :style="scrollStyle">
 			<view class="text-light-muted text-center px-5">
 				{{$t('您还未登录。立即登录，享受更多特权！')}}
 			</view>
@@ -25,15 +25,19 @@
 			<view v-if="list.length != 0" class="list px-2 d-flex flex-wrap">
 				<view class="item mt-3 d-flex flex-column position-relative" v-for="(item, i) in list" :key="i"
 					@click.stop="itemClick(item)">
-					<image class="item-img" :src="item.videolist.full_img" mode=""></image>
+					<image class="item-img" :src="item.full_img" mode=""></image>
 					<view class="item-name flex-1 line-h mt-2 text-white initial text-ellipsis2">
-						{{item.videolist.name}}
+						{{item.name}}
+					</view>
+					<view class="ji-box">
+						{{item.video_name}}
 					</view>
 					<view v-if="isEdit" style="background: #11111180;"
 						class="position-absolute index-3 d-flex a-center j-center top-0 right-0 left-0 bottom-0 index-5"
-						@click.stop="checkClick(item.videolist.id)">
+						@click.stop="checkClick(item.id)">
 						<view class="position-relative w-100 h-100">
 							<view class="position-absolute" style="top: 20rpx; right: 20rpx;">
+					 
 								<view class="check-icon d-flex a-center j-center"
 									:class="item.check ? 'check-active': ''">
 									<u-image v-if="item.check" width="18" height="18"
@@ -71,6 +75,7 @@
 	export default {
 		data() {
 			return {
+				has_login:true,
 				ids: [],
 				allChecked: false,
 				isLoading: true,
@@ -85,8 +90,13 @@
 				islongPress: false
 			}
 		},
+		onLoad(){
+		
+			
+		},
 		onShow() {
-			this.init()
+			this.has_login =  uni.getStorageSync('token')
+			this.onRefresh()
 		},
 		methods: {
 			// 初始化
@@ -94,25 +104,30 @@
 				this.getCollectList()
 			},
 			async getCollectList(e) {
-				let { code, data } = await getCollectList(this.query)
-				if (code == 200) {
-					data.list.forEach((item) => {
-						item.check = false
-					})
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
+				
+				
+				let obj = {}
+				obj.page = 1
+				this.$getapi("Dj/getmyCollect", obj).then(res => {
+					if (res.code == 0) {
+						this.isLoading = false
+						this.list = this.list.concat(res.data.list)
+						this.list.forEach((item) => {
+							item.check = false
+						})
+						if (res.data.list.length == 0) {
+							this.load = 1
+						}
+						console.log(this.list)
 					}
-					if (this.query.page * this.query.limit >= data.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
-				}
+				});
+				
+				
+			 
 			},
 			// 下拉刷新
 			onRefresh() {
+				this.list = []
 				this.query.page = 1
 				this.getCollectList()
 			},
@@ -129,23 +144,25 @@
 			},
 			itemClick(i) {
 				let obj = {
-					vid: i.vid,
-					mid: i.video.id
+					mid: i.movie_id,
+					vid: i.vid
 				}
 				this.$tools.Navigate.navigateTo('/pages-common/detail/index', obj)
 			},
 			// 单选
 			checkClick(i) {
+				console.log(i)
 				let ids = []
 				let bool = true
 				this.list.forEach((item) => {
-					if (item.videolist.id == i) {
+					console.log(item.id == i)
+					if (parseInt(item.id) == parseInt(i)) {
 						item.check = !item.check
 					}
 					if (!item.check) {
 						bool = item.check
 					} else {
-						ids.push(item.videolist.id)
+						ids.push(item.id)
 					}
 				})
 				this.allChecked = bool
@@ -172,22 +189,31 @@
 				let ids = []
 				this.list.forEach((item) => {
 					item.check = this.allChecked
-					ids.push(item.videolist.id)
+					ids.push(item.id)
 				})
 				this.ids = ids
 			},
 			// 删除
 			async deleteSubmit() {
-				let { code } = await delVideo({vid: this.ids.join()})
-				if (code == 200) {
-					this.ids = []
-					uni.showToast({
-						icon: 'none',
-						position: 'bottom',
-						title: this.$t("移除成功")
-					});
-					this.onRefresh()
-				}
+				console.log(this.ids)
+			 
+				let obj = {}
+				obj.mids =  this.ids 
+				
+				this.$getapi("Dj/removeFollow", obj).then(res => {
+					if (res.code == 0) {
+					 this.ids = []
+					 uni.showToast({
+					 	icon: 'none',
+					 	position: 'bottom',
+					 	title: this.$t("移除成功")
+					 });
+					 this.onRefresh()
+					}
+				});
+				
+				
+				 
 			},
 			openTabs(i) {
 				this.list = []
@@ -272,7 +298,15 @@
 			.item {
 				width: 31.3%;
 				margin-right: 20rpx;
-
+				.ji-box{
+					position: absolute;
+					color: #fff;
+					background-color: #333;
+					right:0px;
+					font-size: 12px;
+					top:0rpx;
+					padding:0 5rpx;
+				}
 				.item-img {
 					height: 284rpx;
 					border-radius: 8rpx;

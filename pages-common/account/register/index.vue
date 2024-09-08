@@ -87,18 +87,26 @@
 						title: this.$t('两次输入密码不一致')
 					})
 				}
-				let { code, data } = await register(this.query)
-				if (code == 200) {
-					uni.showToast({
-						icon: 'none',
-						title: this.$t('注册成功'),
-						success() {
-							this.$tools.Navigate.redirectTo('/pages-common/account/login/index', {
-								account: this.query.account
-							})
-						}
-					})
-				}
+				let obj = {}
+				obj = this.query
+				console.log(obj)
+				this.$getapi("Dj/register", obj, true).then(res => {
+					if (res.code == 0) {
+					 uni.showToast({
+					 	icon: 'none',
+					 	title: this.$t('注册成功'),
+					 	success() {
+							uni.setStorageSync('uid',res.data.uid)
+							uni.setStorageSync('token',res.data.token)
+					 		this.$tools.Navigate.redirectTo('index', {
+					 			account: this.query.account
+					 		})
+					 	}
+					 })
+				
+					}
+				});
+			 
 			}
 		},
 		computed: {

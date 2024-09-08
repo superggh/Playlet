@@ -10,7 +10,7 @@
 					</view>
 					<view class="d-flex a-center">
 						<u-image width="36rpx" height="36rpx" src="/static/img/my/icon.png" ></u-image>
-						<span class="ml-1 text-white font-weight font-lg">{{$store.state.userinfo.money}}</span>
+						<span class="ml-1 text-white font-weight font-lg">{{userinfo.balance}}</span>
 					</view>
 				</view>
 				<view class="d-flex a-center j-sb mt-2" @click="$tools.Navigate.navigateTo('/pages-common/balance-detail/index')">
@@ -74,6 +74,7 @@
 	export default {
 		data() {
 			return {
+				userinfo:'',
 				rechargeList: [],
 				rechargeCurrent: 0,
 				query: {
@@ -89,18 +90,29 @@
 				req: false
 			}
 		},
-		onLoad() {
+		onShow() {
 			this.init()
 		},
 		methods: {
 			// 初始化
 			init() {
 				this.getRechargeList()
+				this.getInfo()
 			},
 			// 获取充值列表
+			getInfo() {
+				let obj = {}
+				this.$getapi("Dj/getMyInfo", obj).then(res => {
+					if (res.code == 0) {
+						this.userinfo = res.data
+					}
+				});
+			
+			
+			},
 			async getRechargeList() {
 				let { code, data } = await getRechargeConfig()
-				if (code == 200) {
+				if (code == 0) {
 					this.rate = data.rate
 					this.tips = data.tips
 					this.rechargeList = data.options

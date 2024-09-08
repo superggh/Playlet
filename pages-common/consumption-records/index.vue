@@ -16,16 +16,16 @@
 							{{item.name}}
 						</view>
 						<view class="info-time font-md main-text-color">
-							{{item.lx == 1 ? $t('已购买全集') : $t('已购买单集')}}
+							{{item.type == 1 ? $t('已购买全集') : $t('已购VIP')}}
 						</view>
 						<view class="d-flex a-end">
 							<view class="time font text-light-muted line-h">
-								{{item.ftime | date('dd/mm/yyyy hh:MM:ss')}}
+								{{item.ctime}}
 							</view>
 							<view class="d-flex a-center ml-auto">
 								<u-image width="40rpx" height="40rpx" src="/static/img/my/icon.png"></u-image>
 								<view class="main-text-color d-flex a-center font-weight font-md line-h">
-									{{item.zprice}}
+									{{item.amount}}
 								</view>
 							</view>
 						</view>
@@ -61,26 +61,31 @@
 			},
 			// 获取数据
 			async getData(e) {
-				let {
-					data,
-					code
-				} = await getConsumptionList(this.query)
-				if (code == 200) {
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
-						this.total = data.total
+				this.$getapi("Dj/getMyMoneyLog", this.query).then(res => {
+					if (res.code == 0) {
+						this.isLoading = false
+				
+						if (res.data.list.length == 0) {
+							this.isEdit = false
+						} else {
+							res.data.list.forEach((item) => {
+								item.check = false
+							})
+						}
+						this.list = this.list.concat(res.data.list)
+						if (this.query.limit > res.data.total) {
+							return this.load = 1
+						} else {
+							return this.load = 0
+						}
 					}
-					if (this.query.page * this.query.limit >= this.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
-				}
+				});
+				
+				 
 			},
 			// 下拉刷新
 			onRefresh() {
+				this.list = []
 				this.query.page = 1
 				this.getData()
 			},

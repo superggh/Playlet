@@ -1,3 +1,3 @@
 export default {
-	baseURL: 'http://192.168.2.33:8100',
+	baseURL: 'https://api.angula.net/dj',
 }

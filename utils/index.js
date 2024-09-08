@@ -7,3 +7,11 @@ export const getToken = () => {
 		throw new Error(e)
 	}
 }
+export const getUid = () => {
+	try {
+		const value = uni.getStorageSync('uid');
+		return value ? value : '';
+	} catch (e) {
+		throw new Error(e)
+	}
+}

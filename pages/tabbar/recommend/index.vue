@@ -1,24 +1,26 @@
 <template>
 	<view class="page">
-		<swiper vertical :style="scrollStyle" :current="current" @change="swiperChange">
-			<swiper-item class="h-100" v-for="(item, i) in list" :key="i">
+ 
+		<swiper vertical :style="scrollStyle" :current="current" @change="swiperChange" @transition="transition">
+			<swiper-item class="h-100" v-for="(item, i) in list" :key="i" :item-id="i.toString()">
 				<yingbing-video :autoplay="i == 0" :ref="'video' + i" class="h-100"
-					:poster="item.videolist.full_img" :src="item.videourl"
+					:poster="item.full_img" :src="item.videourl"
 					@play="monitorPlay" @ended="ended" @pause="monitorPause" @timeupdate="timeupdate">
+			
 					<template #controls>
 						<view class="position-absolute top-half left-half tf-half-xy text-white">
-							<u-icon @click="videoPlay(i)" v-if="item.status == 0" name="play-right-fill"
+							<u-icon @click="videoPlay(i)" v-if="item.playstatus == 0" name="play-right-fill"
 								size="50" color="#ffffff80"></u-icon>
 							<u-icon @click="videoPause(i)" v-else name="pause" size="50"
 								color="#ffffff80"></u-icon>
 						</view>
 						<view class="d-flex a-center j-center flex-column"
 							style="position:absolute;right:20rpx;bottom: 100px;">
-							<view class="d-flex a-center j-center flex-column" @click.stop="openLike(item, i)">
+							<!-- <view class="d-flex a-center j-center flex-column" @click.stop="openLike(item, i)">
 								<image style="width: 70rpx; height: 70rpx;"
 									:src="`/static/img/common/${item.love == 0 ? 'like' : 'like-active'}.png`"></image>
 								<view class="font" :style="{color: item.love == 0 ? '#fff': '#F73648'}">
-									{{$t('点赞')}}
+									{{$t('点赞')}}	 
 								</view>
 							</view>
 							<view class="d-flex a-center j-center flex-column mt-3" @click.stop="openCollect(item, i)">
@@ -27,14 +29,14 @@
 								<view class="font" :style="{color: item.collect == 0 ? '#fff': '#F8B33B'}">
 									{{$t('追剧')}}
 								</view>
-							</view>
+							</view> -->
 						</view>
 						<view class="text-white" style="position:absolute;left:20rpx;bottom: 100px;">
 							<view class="text-ellipsis5" style="width: 500rpx;">
-								{{item.videolist.name}}
+								{{item.name}}
 							</view>
 							<view class="text-ellipsis5 mt-2" style="width: 500rpx;">
-								{{item.videolist.story}}
+								{{item.story}}
 							</view>
 							<view class="d-flex a-center" @click.stop="selectEpisode(item)">
 								<span class="text-white mr-1">{{$t('去看全集')}}</span>
@@ -66,6 +68,7 @@
 	export default {
 		data() {
 			return {
+				
 				list: [],
 				current: 0,
 				tempQuery: {
@@ -82,6 +85,7 @@
 				timeout: null
 			}
 		},
+		
 		onShow() {
 			this.init()
 		},
@@ -94,36 +98,54 @@
 			},
 			// 获取数据
 			async getData(e) {
-				let {
-					data,
-					code
-				} = await getRecommendVideo()
-				if (code == 200) {
-					data.forEach((item) => {
-						item.status = 0
-					})
-					if (this.list.length > 20) {
-						this.current = 0
-						this.list = data
-					}else {
-						this.list = this.list.concat(data)
+				let obj = {}
+				obj.page = 1
+				this.$getapi("Dj/getRecomment", obj).then(res => {
+					if (res.code == 0) {
+						this.list = res.data.list
 					}
-				}
+				});
+				
+				
+				 
 			},
 			// 打开选剧集弹框
 			selectEpisode(item) {
 				let obj = {
-					vid: item.videolist.id,
+					vid: item.vid,
 					mid: item.id
 				}
 				this.$tools.Navigate.navigateTo('/pages-common/detail/index', obj)
 			},
 			// 点赞
 			async openLike(item, i) {
-				if (!this.$store.state.token) {
-					return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
+				console.log(item,i)
+				return
+				if (item.love == 0) {
+					this.likeQuery.type = 1
+				} else {
+					this.likeQuery.type = 0
 				}
-				this.likeQuery.vid = item.videolist.id
+				this.$getapi("Dj/setLike", this.likeQuery).then(res => {
+					if (res.code == 0) {
+						if (res.data == 1) {
+							this.detail.love = 1
+							uni.showToast({
+								icon: 'none',
+								title: this.$t('点赞成功')
+							})
+						} else {
+							this.detail.love = 0
+							uni.showToast({
+								icon: 'none',
+								title: this.$t('已取消点赞')
+							})
+						}
+					}
+				});
+				
+		 
+				this.likeQuery.vid = item.id
 				this.likeQuery.mid = item.id
 				if (item.love == 0) {
 					this.likeQuery.type = 1
@@ -151,6 +173,8 @@
 			},
 			// 收藏
 			async openCollect(item, i) {
+				console.log(item,i)
+				 return
 				if (!this.$store.state.token) {
 					return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
 				}
@@ -190,55 +214,62 @@
 			},
 			// 点击播放
 			videoPlay(i) {
+				
 				this.$refs[`video${i}`][0].play()
 			},
 			// 点击暂停
 			videoPause(i) {
+				 
 				this.$refs[`video${i}`][0].pause()
 			},
 			// 播放进度上报
 			async playScheduleReport() {
-				await videoLog({
-					vid: this.list[this.current].videolist.id,
-					mid: this.list[this.current].id,
-					vtime: this.scheduleTime
-				})
+				// await videoLog({
+				// 	vid: this.list[this.current].videolist.id,
+				// 	mid: this.list[this.current].id,
+				// 	vtime: this.scheduleTime
+				// })
 			},
 			// 监听播放事件
 			monitorPlay() {
-				this.list[this.current].status = 1
-				if (this.$store.state.token) {
-					clearInterval(this.timeout)
-					this.timeout = setInterval(() => {
-						this.playScheduleReport()
-					}, 10000)
-				}
+				console.log(this.current)
+				this.list[this.current].playstatus = 1
+			 		console.log(this.list)
 			},
 			// 监听暂停事件
 			monitorPause() {
-				this.list[this.current].status = 0
-				if (this.$store.state.token) {
-					clearInterval(this.timeout)
-				}
+					console.log(this.current)
+				this.list[this.current].playstatus = 0
+				console.log(this.list)
 			},
 			// 监听播放进度事件
 			timeupdate(e) {
 				this.scheduleTime = e.currentTime
 			},
+			transition(i){
+				console.log(i)
+			    this.$refs[`video${this.current}`][0].pause()
+			},
 			// 滚动切换
 			swiperChange(i) {
+				console.log(i,this.current,i.detail.current)
+				this.$refs[`video${this.current}`][0].pause()
+				console.log('stop' + this.current)
 				clearInterval(this.timeout)
 				if (i.detail.current > this.current) {
 					this.$refs[`video${i.detail.current - 1}`][0].toggle()
 				}else if (i.detail.current < this.current) {
 					this.$refs[`video${i.detail.current + 1}`][0].toggle()
 				}
-				this.current = i.detail.current
+				setTimeout(function() {
+					this.current = i.detail.current
+					this.$refs[`video${i.detail.current}`][0].play()
+							console.log('play' + i.detail.current)
+				}, 200);
 				
-				this.$refs[`video${i.detail.current}`][0].play()
-				if (i.detail.current < (this.list.length - 1)) {
-					this.getData('S')
-				}
+				// if (i.detail.current < (this.list.length - 1)) {
+				// 	this.getData('S')
+				// }
 			},
 			// 播放结束事件
 			ended() {

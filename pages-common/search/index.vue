@@ -57,12 +57,20 @@
 						icon="/static/img/common/empty.png">
 					</u-empty>
 					<view class="px-2 mt-2" v-if="list && list.length != 0">
-						<view class="d-flex mt-2" v-for="(item,index) in list" :key="index" @click="get_detail(item.id)">
+						<view class="d-flex mt-2" v-for="(item,index) in list" :key="index"
+							@click="get_detail(item.id)">
 							<u-image radius="6" width="215rpx" height="260rpx" :src="item.full_img"></u-image>
 							<view class="d-flex ml-2 flex-column" style="height: 260rpx;">
-								<view class="item-title line-h-md text-white text-ellipsis1">{{ item.name }}</view>
+								<view class="item-title line-h-md  text-ellipsis1" style="color:red">{{ item.name }}</view>
+								<view class="item-state line-h-md text-ellipsis2 mt-auto">
+									{{item.actor}}
+								</view>
+
+								<view class="item-state line-h-md text-ellipsis2 mt-auto">
+									{{item.category}}
+								</view>
 								<view class="item-state line-h-md text-ellipsis5 mt-auto">
-									{{item.story}}
+									{{$t('追剧')}}:{{item.sum}}
 								</view>
 							</view>
 						</view>
@@ -135,32 +143,39 @@
 				}
 				this.$store.commit('updateRecommList', arr)
 				uni.setStorageSync('recommList', arr)
+				this.list = []
 				this.get_cartoon_list()
 
 				this.isSearchResult = true
 			},
 
 			async get_cartoon_list(e) {
-				let {
-					data,
-					code
-				} = await getSearchList(this.query)
-				if (code == 200) {
-					if (e) { // 加载更多
-						this.list = this.list.concat(data.list)
-					} else {
-						this.list = data.list
-					}
-					if (this.query.page * this.query.limit >= data.total) {
-						return this.load = 1
-					} else {
-						return this.load = 2
-					}
 
-				}
+
+				this.$getapi("Dj/search", this.query).then(res => {
+					if (res.code == 0) {
+						this.isLoading = false
+
+						if (res.data.list.length == 0) {
+							this.isEdit = false
+						} else {
+							res.data.list.forEach((item) => {
+								item.check = false
+							})
+						}
+						this.list = this.list.concat(res.data.list)
+						if (this.query.limit > res.data.total) {
+							return this.load = 1
+						} else {
+							return this.load = 0
+						}
+					}
+				});
+
 			},
 			// 下拉刷新
 			onRefresh() {
+				this.list = []
 				this.isLoading = true
 				this.query.page = 1
 				this.get_cartoon_list()
@@ -207,7 +222,7 @@
 		.list {
 			.item {
 				.item-state {
-					color: #EE7623;
+					color: #999;
 					font-size: 24rpx;
 				}
 			}
@@ -216,6 +231,7 @@
 				margin-top: 0 !important;
 			}
 		}
+
 		.recomm {
 			.recomm-title {
 				font-size: 32rpx;

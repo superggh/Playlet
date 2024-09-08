@@ -1,5 +1,6 @@
 <template>
 	<view>
+	
 		<view
 		:id="'yb-video' + dataId"
 		class="yb-video"
@@ -14,6 +15,8 @@
 				</view>
 			</view>
 		</view>
+		
+	
 	</view>
 </template>
 
@@ -29,6 +32,10 @@
 			},
 			//播放链接
 			src: {
+				type: String,
+				default: ''
+			},
+			srt: {
 				type: String,
 				default: ''
 			},
@@ -217,6 +224,7 @@
 					state: this.state,
 					seekTime: this.seekTime,
 					src: this.src,
+				    srt: this.srt,
 					barrages: this.barrages,
 					poster: this.poster,
 					formats: this.formats,
@@ -272,6 +280,7 @@
 			// #ifdef APP-VUE
 			plus.screen.lockOrientation(this.generallyDirection);
 			// #endif
+		 
 		},
 		beforeDestroy() {
 			// #ifdef APP-VUE
@@ -455,6 +464,12 @@
 			window.flvjs = require("../modules/flv.min.js")
 			window.YBBarrage = require("../modules/ybbarrage.js")
 			this.switchVideo()
+			setTimeout(function() {
+				let vvv = document.querySelector('video')
+				vvv.textTracks[0].mode = 'enable'
+				let ttt = vvv.textTracks[0]
+				console.log(ttt)
+			}, 2000);
 		},
 		beforeDestroy() {
 			if ( this.dp ) {
@@ -628,6 +643,7 @@
 						this.dp = new YBPlayer({
 							container: this.dom,
 							src: this.videoProp.src,
+						    srt: this.videoProp.srt,
 							poster: this.videoProp.poster,
 							title: this.videoProp.title,
 							formats: this.videoProp.formats,

@@ -5,19 +5,18 @@
 		<m-scroll-y placeHeight="150rpx" :isLoading="false" :scrollStyle="scrollStyle" :isCustomRefresh="false">
 			<view class="p-2">
 				<view class="user position-relative ">
-					<view v-if="$store.state.token" class="d-flex a-center">
-						<u-image width="80rpx" height="80rpx"
-							src="/static/img/my/avatar.png"></u-image>
+					<view   class="d-flex a-center">
+						<u-image width="80rpx" height="80rpx" src="/static/img/my/avatar.png"></u-image>
 						<view class="text-white text-ellipsis1 font-weight ml-2">
-							{{$store.state.userinfo.nickname}}
+							{{userinfo.invite_code}}
 						</view>
 						<view class="ml-auto flex-shrink text-light-muted">
-							ID: {{$store.state.userinfo.id}}
+							Email: {{userinfo.email}}
 						</view>
 					</view>
-					<view v-else class="text-white" style="height: 80rpx;line-height: 80rpx;">
+				<!-- 	<view v-else class="text-white" style="height: 80rpx;line-height: 80rpx;">
 						{{$t('您还未登录。请登录后购买！')}}
-					</view>
+					</view> -->
 					<view class="position-absolute d-flex flex-column left-0 w-100 vip hidden">
 						<u-image width="126rpx" height="53rpx" src="/static/img/my/vip-tag.png"></u-image>
 						<view class="vip-info d-flex a-center j-sb">
@@ -25,8 +24,9 @@
 								<view class="font-weight font-md" style="color: #333333;">
 									{{$t('VIP会员')}}
 								</view>
-								<view v-if="$store.state.userinfo.group_id == 2" class="font-weight font" style="color: #666666;">
-									{{$t('有效期至')}} {{$store.state.userinfo.dtime | date('dd/mm/yyyy hh:MM:ss')}}
+								<view v-if="userinfo.vip >= 1" class="font-weight font"
+									style="color: #666666;">
+									{{$t('有效期至')}} {{userinfo.vip_timeout | date('dd/mm/yyyy hh:MM:ss')}}
 								</view>
 								<view v-else class="font-weight font" style="color: #666666;">
 									{{$t('快加入会员吧！')}}
@@ -34,7 +34,7 @@
 							</view>
 							<u-image width="151.68rpx" height="130.64rpx" src="/static/img/my/vip-mark.png"></u-image>
 						</view>
-						<view v-if="$store.state.userinfo.group_id == 2" class="time mt-auto d-flex a-center px-3">
+						<view v-if="userinfo.vip >= 1" class="time mt-auto d-flex a-center px-3">
 							<view class="time-name">
 								{{$t('尊贵的VIP用户，欢迎您的加入！')}}
 							</view>
@@ -75,7 +75,8 @@
 								<view class="item-price d-flex a-center flex-column j-center mt-5">
 									<span class="price font-weight line-h"
 										:class="VIPIndex == i ? 'price-active': ''">{{item.price}}</span>
-									<u-image class="mt-2" width="50rpx" height="50rpx" src="/static/img/my/coin.png"></u-image>
+									<u-image class="mt-2" width="50rpx" height="50rpx"
+										src="/static/img/my/coin.png"></u-image>
 								</view>
 							</view>
 						</view>
@@ -98,11 +99,16 @@
 </template>
 
 <script>
-	import { getVIPConfig } from '@/utils/request/api/get.js'
-	import { buyVIP } from '@/utils/request/api/post.js'
+	import {
+		getVIPConfig
+	} from '@/utils/request/api/get.js'
+	import {
+		buyVIP
+	} from '@/utils/request/api/post.js'
 	export default {
 		data() {
 			return {
+				userinfo:'',
 				equityList: [{
 						img: '/static/img/my/vip1.png',
 						name: this.$t('特殊报价')
@@ -134,20 +140,37 @@
 			// 初始化
 			init() {
 				this.getData()
+				this.getInfo()
+			},
+			getInfo() {
+				let obj = {}
+				this.$getapi("Dj/getMyInfo", obj).then(res => {
+					if (res.code == 0) {
+						this.userinfo = res.data
+					}
+				});
+			
+			
 			},
 			// 获取VIP数据
 			async getData() {
-				let { code, data } = await getVIPConfig()
-				if (code == 200) {
-					this.VIPPriceList = data
-				}
+				this.$getapi("Dj/getVIPConfig", this.query).then(res => {
+					if (res.code == 0) {
+						this.VIPPriceList = res.data.list
+					}
+				});
+
+
 			},
 			// 开通VIP
 			async openVIP() {
 				if (!this.$store.state.token) {
 					return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
 				}
-				let { code, data } = await buyVIP(this.query)
+				let {
+					code,
+					data
+				} = await buyVIP(this.query)
 				if (code == 200) {
 					this.$store.dispatch('getUserinfo')
 					uni.showToast({
@@ -305,19 +328,21 @@
 				background: linear-gradient(180deg, #FFE3C2 0%, #FFD7C0 100%);
 			}
 		}
+
 		.bottombox {
 			background-color: #000000;
+
 			.bottombox-ri {
 				height: 100rpx;
 				background: #F3E0B3;
 				border-radius: 16rpx;
-		
+
 				.bottombox-name {
 					background: #744201;
 					-webkit-background-clip: text;
 					-webkit-text-fill-color: transparent;
 				}
-		
+
 				.bottombox-price {
 					font-size: 22rpx;
 					background: #744201;

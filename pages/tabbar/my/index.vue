@@ -11,10 +11,10 @@
 				</view>
 				<view v-if="userinfo" class="user-info d-flex flex-column j-around">
 					<view class="info-name font-lg line-h text-white">
-						{{token ? userinfo.nickname : $t('前往登录')}}
+						{{token ? userinfo.email : $t('前往登录')}}
 					</view>
 					<view v-if="token" class="info-desc font-md text-light-muted line-h mt-2">
-						ID: {{userinfo.id}}
+						ID: {{userinfo.invite_code}}
 					</view>
 					<view v-else class="user-notice text-light-muted line-h mt-2">
 						{{$t('您还未登录。立即登录，享受更多特权！')}}
@@ -23,11 +23,11 @@
 			</view>
 			<view v-if="userinfo" class="vip p-3 mt-3 d-flex  flex-column j-around" @click="openVIP">
 				<view class="vip-name font-md d-flex a-center line-h">
-					{{userinfo.group_id == 2 && $store.state.token ? $t('尊贵的VIP会员') : $t('会员专属')}}
+					{{userinfo.vip >=0 && $store.state.token ? $t('尊贵的VIP会员') : $t('会员专属')}}
 					<u-image class="ml-2" width="30rpx" height="30rpx" src="/static/img/my/right.png"></u-image>
 				</view>
-				<view v-if="userinfo.group_id == 2 && $store.state.token" class="vip-desc line-h mt-1">
-					{{$t('有效期至')}} {{userinfo.dtime | date('dd/mm/yyyy hh:MM:ss')}}
+				<view v-if="userinfo.vip >=0 && $store.state.token" class="vip-desc line-h mt-1">
+					{{$t('有效期至')}} {{userinfo.vip_timeout | date('dd/mm/yyyy hh:MM:ss')}}
 				</view>
 				<view v-else class="vip-desc mt-3 line-h mt-1">
 					{{$t('充值越多，折扣越优惠')}}
@@ -45,7 +45,7 @@
 				<view class="d-flex a-center mt-5">
 					<view class="d-flex a-center text-white font-weight">
 						<u-image width="50rpx" height="50rpx" src="/static/img/my/coin.png"></u-image>
-						<span v-if="userinfo" class="ml-1 balance-value line-h">{{token ? userinfo.money : '--'}}</span>
+						<span v-if="userinfo" class="ml-1 balance-value line-h">{{token ? userinfo.balance : '--'}}</span>
 					</view>
 					<view class="balance-up line-h ml-auto d-flex a-center j-center" @click="openTopUp">
 						{{$t('充值')}}
@@ -63,7 +63,7 @@
 							V{{$store.state.appSystemInfo.appVersion}}
 						</view>
 					</m-cell>
-					<m-cell v-if="item.id == 6 && $store.state.token" BBColor="#262529" :itemStyle="{height: '120rpx'}"
+					<m-cell v-if="item.id == 6  " BBColor="#262529" :itemStyle="{height: '120rpx'}"
 						imgWidth="58rpx" imgHeight="58rpx" i18n color="#fff" :item="item">
 					</m-cell>
 				</view>
@@ -98,52 +98,58 @@
 		},
 		data() {
 			return {
+				userinfo:'',
 				menuList,
 				show: false,
 				langShow: false,
 			}
 		},
 		onShow() {
-			this.init()
+	 
+			this.getInfo()
 		},
 		methods: {
-			// 初始化
-			init() {
-				this.$store.dispatch('getUserinfo')
+
+			getInfo() {
+				let obj = {}
+				this.$getapi("Dj/getMyInfo", obj).then(res => {
+					if (res.code == 0) {
+						this.userinfo = res.data
+					}
+				});
+
+
 			},
+	 
 			// 前往余额明细
 			openBalanceDetail() {
-				if (!this.$store.state.token) {
-					return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
-				}
+				// if (!this.$store.state.token) {
+				// 	return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
+				// }
 				this.$tools.Navigate.navigateTo('/pages-common/balance-detail/index')
 			},
 			// 前往充值
 			openTopUp() {
-				if (!this.$store.state.token) {
-					return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
-				}
+				// if (!this.$store.state.token) {
+				// 	return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
+				// }
 				this.$tools.Navigate.navigateTo('/pages-common/balance-topup/index')
 			},
 			// 前往VIP
 			openVIP() {
-				if (!this.$store.state.token) {
-					return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
-				}
+				// if (!this.$store.state.token) {
+				// 	return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
+				// }
 				this.$tools.Navigate.navigateTo('/pages-common/vip/index')
 			},
 			menuClick(item) {
 				switch (item.id) {
 					case 1:
-						if (!this.$store.state.token) {
-							return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
-						}
+
 						this.$tools.Navigate.navigateTo(item.page)
 						break;
 					case 2:
-						if (!this.$store.state.token) {
-							return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
-						}
+
 						this.$tools.Navigate.navigateTo(item.page)
 						break;
 					case 3:
@@ -162,26 +168,27 @@
 			},
 			// 前往登录
 			openLogin() {
-				if (!this.$store.state.token) {
-					this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
-				}
+		 
+					this.$tools.Navigate.redirectTo('/pages-common/account/login/index')
+			 
 			},
 			// 确认退出登录
 			async confirmLogout() {
-				let {
-					code
-				} = await logout()
-				if (code == 200) {
-					uni.removeStorageSync('token')
-					uni.removeStorageSync('userinfo')
-					this.$store.commit('updateToken', '')
-					this.$store.commit('updateUserinfo', {})
-					this.show = false
-					uni.showToast({
-						icon: 'none',
-						title: this.$t('退出登录成功')
-					})
-				}
+				let obj = {}
+				this.$getapi("Dj/Logout", obj).then(res => {
+					if (res.code == 0) {
+						uni.removeStorageSync('uid')
+						uni.removeStorageSync('token') 
+						this.show = false
+						uni.showToast({
+							icon: 'none',
+							title: this.$t('退出登录成功')
+						})
+						this.openLogin()
+					}
+				});
+				
+			 
 			},
 			// 确认切换语言
 			confirmSwitch(lang) {
@@ -202,11 +209,9 @@
 					height: `calc(100vh - env(safe-area-inset-bottom) - ${this.$store.state.tabbarHeight}px)`
 				}
 			},
-			userinfo() {
-				return this.$store.state.userinfo
-			},
+		 
 			token() {
-				return this.$store.state.token
+				return uni.getStorageSync('token')
 			}
 		}
 	}

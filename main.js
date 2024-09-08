@@ -22,6 +22,9 @@ import tools from '@/main_modules/tools/index.js'
 import check from '@/main_modules/check/index.js'
 import multiportApi from '@/main_modules/uni-api/index.js'
 Vue.prototype.$http = http
+
+import   {getapi}  from "@/utils/request/api/api.js";
+Vue.prototype.$getapi = getapi;
 // Vue.prototype.$socket = socket
 // Vue.prototype.$worker = worker
 Vue.prototype.$store = store
