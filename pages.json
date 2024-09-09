@@ -28,7 +28,8 @@
 				"navigationStyle": "custom",
 				"enablePullDownRefresh": false
 			}
-		}
+		} 
+		 
 	],
 	"subPackages": [{
 			"root": "pages-common",

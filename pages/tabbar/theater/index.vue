@@ -195,6 +195,7 @@
 			// 下拉刷新
 			onRefresh() {
 				this.query.page = 1
+				this.list = []
 				this.getData()
 			},
 			// 加载更多
