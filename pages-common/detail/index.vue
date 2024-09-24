@@ -59,11 +59,11 @@
 		</yingbing-video>
 
 		<m-popup :show="show" i18n @close="showClose" title="选择剧集">
-			<m-scroll-y bgColor="#111" :isLoading="false" :scrollStyle="{height: '60vh'}" :isCustomRefresh="false">
+			<m-scroll-y :scrollTop="scrollTop" bgColor="#111" :isLoading="false" :scrollStyle="{height: '60vh',paddingBottom:'50px'}" :isCustomRefresh="false" @scroll="scroll">
 				<view class="select w-100 d-flex flex-wrap p-3">
 					<view @click="openVideo(i)" class="item hidden mt-2 d-flex flex-column position-relative"
 						v-for="(item, i) in detail.list" :key="i">
-						<u-image width="100%" height="420rpx" :src="item.img"></u-image>
+						<u-image width="100%" height="120rpx" :src="item.img"></u-image>
 						<view class="text-white p-2 line-h">
 							{{item.name}}
 						</view>
@@ -246,6 +246,8 @@
 		},
 		data() {
 			return {
+				scrollTop:0,
+				oldscrolltop:0,
 				barrages_show:true,
 				barrages: [],
 				showComment: false,
@@ -327,6 +329,10 @@
 			clearInterval(this.timeout)
 		},
 		methods: {
+			scroll(e){
+				 
+				  this.oldscrolltop = e.scrollTop
+			},
 			getComment(){
 				let obj = {}
 				obj.movie_id = this.query.mid
@@ -472,6 +478,9 @@
 			selectEpisode() {
 				this.$refs.video.pause()
 				this.show = true
+				
+			 
+			 
 			},
 			// 购买视频
 			openPayVideo(i) {
@@ -599,6 +608,7 @@
 				} else {
 					this.show = false
 					this.query.vid = this.detail.list[this.current].id
+				
 				}
 
 
@@ -781,10 +791,10 @@
 
 		.select {
 			background-color: #111;
-
+	
 			.item {
-				width: 48.5%;
-				margin-right: 3%;
+				width: 19%;
+				margin-right: 1%;
 				background-color: #333;
 				border-radius: 16rpx;
 
@@ -806,13 +816,9 @@
 				}
 			}
 
-			.item:nth-child(1),
-			.item:nth-child(2),
-			{
-			margin-top: 0 !important;
-		}
+		 
 
-		.item:nth-child(2n) {
+		.item:nth-child(5n) {
 			margin-right: 0 !important;
 		}
 	}

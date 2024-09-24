@@ -15,13 +15,16 @@
 							<view class="info-title text-white">
 								{{amountName(item)}}
 							</view>
+							<view class="info-title text-white">
+							 {{item.remark}}
+							</view>
 							<view class="info-time text-light-muted">
 								{{item.ctime}}
 							</view>
 						</view>
 					</view>
 					<view class="d-flex a-center line-h" :class="item.remark == 1 ? 'main-text-color' : 'text-light-muted'">
-						{{item.de_type == 1 ? '+' : '-'}}{{item.amount}} <u-image width="30rpx" height="30rpx" src="/static/img/my/coin.png"></u-image>
+						 {{item.amount}} <u-image width="30rpx" height="30rpx" src="/static/img/my/coin.png"></u-image>
 					</view>
 				</view>
 			</view>

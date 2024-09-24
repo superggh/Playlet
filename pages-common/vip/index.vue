@@ -8,10 +8,10 @@
 					<view   class="d-flex a-center">
 						<u-image width="80rpx" height="80rpx" src="/static/img/my/avatar.png"></u-image>
 						<view class="text-white text-ellipsis1 font-weight ml-2">
-							{{userinfo.invite_code}}
+						Email: {{userinfo.email}}  - {{userinfo.invite_code}}  
 						</view>
 						<view class="ml-auto flex-shrink text-light-muted">
-							Email: {{userinfo.email}}
+							 ${{userinfo.balance}} 
 						</view>
 					</view>
 				<!-- 	<view v-else class="text-white" style="height: 80rpx;line-height: 80rpx;">
@@ -129,7 +129,8 @@
 				VIPPriceList: [],
 				VIPIndex: 0,
 				query: {
-					vip_code: ''
+					vip_code: '',
+					id:1
 				}
 			}
 		},
@@ -164,25 +165,23 @@
 			},
 			// 开通VIP
 			async openVIP() {
-				if (!this.$store.state.token) {
-					return this.$tools.Navigate.navigateTo('/pages-common/account/login/index')
-				}
-				let {
-					code,
-					data
-				} = await buyVIP(this.query)
-				if (code == 200) {
-					this.$store.dispatch('getUserinfo')
-					uni.showToast({
-						icon: 'none',
-						title: this.$t('开通VIP成功')
-					})
-				}
+			 
+				 this.$getapi("Dj/BuyVip", this.query).then(res => {
+				 	if (res.code == 0) {
+				 		uni.showToast({
+				 			icon: 'none',
+				 			title: this.$t('开通VIP成功')
+				 		})
+						this.getInfo()
+				 	}
+				 });
+				 
+				 
 			},
 			// 选择vip
 			selectVIP(item, i) {
 				this.VIPIndex = i
-				this.query.vip_code = item.code
+				this.query.id = item.id
 			}
 		},
 		computed: {

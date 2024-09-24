@@ -945,7 +945,11 @@
 				},{
 					label: '2.0',
 					value: 2.0
-				}];
+				},{
+					label: '3.0',
+					value: 3.0
+				}
+				];
 				for ( let rate of playbackRates ) {
 					this._playbackRateEl.innerHTML += `
 						<div class="${this._setClassName('ybplayer-setting')}" data-rate="${rate.value}">
@@ -958,7 +962,10 @@
 				for ( let i = 0; i < this._querySelectorAll('ybplayer-setting').length; i++ ) {
 					this._querySelectorAll('ybplayer-setting')[i].onclick = function () {
 						that.setConfig('playbackRate', this.getAttribute('data-rate'))
-					}
+						that._hidePlaybackRate()
+				 
+						console.log('_hidePlaybackRate')
+					}	
 				}
 			}
 	    },

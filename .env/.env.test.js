@@ -1,3 +1,3 @@
 export default {
-	baseURL: '',
+	baseURL: 'https://api.angula.net/dj',
 }

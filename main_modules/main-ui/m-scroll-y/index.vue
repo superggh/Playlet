@@ -50,6 +50,7 @@
 		},
 		created() {
 			this.init()
+		 
 		},
 		methods: {
 			//初始化

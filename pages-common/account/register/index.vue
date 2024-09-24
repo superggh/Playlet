@@ -98,9 +98,7 @@
 					 	success() {
 							uni.setStorageSync('uid',res.data.uid)
 							uni.setStorageSync('token',res.data.token)
-					 		this.$tools.Navigate.redirectTo('index', {
-					 			account: this.query.account
-					 		})
+					 	    this.$tools.Navigate.switchTab('/pages/tabbar/theater/index')
 					 	}
 					 })
 				
