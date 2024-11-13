@@ -57,6 +57,7 @@
 		methods: {
 			// 注册
 			async submitRegister() {
+				let that = this
 				if(!this.query.account) {
 					return uni.showToast({
 						icon: 'none',
@@ -98,7 +99,7 @@
 					 	success() {
 							uni.setStorageSync('uid',res.data.uid)
 							uni.setStorageSync('token',res.data.token)
-					 	    this.$tools.Navigate.switchTab('/pages/tabbar/theater/index')
+					 	    that.$tools.Navigate.switchTab('/pages/tabbar/theater/index')
 					 	}
 					 })
 				

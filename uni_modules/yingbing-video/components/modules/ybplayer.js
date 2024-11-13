@@ -150,7 +150,7 @@
 	        }
 
 	        this._videoEl = document.createElement('DIV');
-
+			console.log("initvideo")
 			
 	        this._videoEl.setAttribute('class', 'ybplayer-video-content');
 	        this._wrapperEl.appendChild(this._videoEl);
@@ -963,7 +963,7 @@
 					this._querySelectorAll('ybplayer-setting')[i].onclick = function () {
 						that.setConfig('playbackRate', this.getAttribute('data-rate'))
 						that._hidePlaybackRate()
-				 
+						localStorage.setItem('playbackRate',this.getAttribute('data-rate'))
 						console.log('_hidePlaybackRate')
 					}	
 				}
@@ -1395,6 +1395,12 @@
 	           throw new TypeError("TypeError: YBPlayer.play is not a constructor")
 	        }
 			this.video && this.video.play()
+			
+				console.log("video play")
+				setTimeout(  ()=> {
+					let rate = localStorage.getItem('playbackRate')
+					this.setConfig('playbackRate',  rate)
+				}, 1000);
 	    },
 	    enumerable:false
 	})
@@ -1404,6 +1410,8 @@
 	           throw new TypeError("TypeError: YBPlayer.pause is not a constructor")
 	        }
 			this.video && this.video.pause()
+			localStorage.setItem('playbackRate',1)
+			this.setConfig('playbackRate',  1)
 	    },
 	    enumerable:false
 	})

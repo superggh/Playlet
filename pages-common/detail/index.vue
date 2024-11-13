@@ -30,18 +30,19 @@
 							{{$t('追剧')}}
 						</view>
 					</view>
-					<view class="d-flex a-center j-center flex-column mt-3" @click.stop="selectEpisode">
-						<image style="width: 70rpx; height: 70rpx;" src="/static/img/common/episode.png"></image>
-						<view class="font text-white">
-							{{$t('剧集')}}
-						</view>
-					</view>
 					<view class="d-flex a-center j-center flex-column mt-3" @click.stop="doshowComment">
 						<image style="width: 70rpx; height: 70rpx;" src="/static/img/tabbar/theater-active.png"></image>
 						<view class="font text-white">
 							{{$t('评论')}}
 						</view>
 					</view>
+					<view class="d-flex a-center j-center flex-column mt-3" @click.stop="selectEpisode">
+						<image style="width: 70rpx; height: 70rpx;" src="/static/img/common/episode.png"></image>
+						<view class="font text-white">
+							{{$t('剧集')}}
+						</view>
+					</view>
+			
 				</view>
 				<view class="text-white" style="position:absolute;left:20rpx;bottom: 100px;">
 					<view class="text-ellipsis5" style="width: 500rpx;">
@@ -452,6 +453,7 @@
 							if (res.data.is_play == 0) {
 								this.payShow = true
 							}
+							
 						})
 						this.detail = res.data
 						this.getSrt(res.data.srt)
@@ -629,10 +631,11 @@
 							this.timeShow = false
 							this.current++
 							this.query.vid = this.detail.list[this.current].id
-							this.$refs.video.play()
+						
 
 							this.$getapi("Dj/updateHistory", this.query).then(res => {
-
+								this.$refs.video.play()
+								this.getComment()
 							});
 
 							let date = setTimeout(() => {

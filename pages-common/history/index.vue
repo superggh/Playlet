@@ -145,7 +145,7 @@
 			itemClick(i) {
 				let obj = {
 					vid: i.vid,
-					mid: i.id
+					mid: i.movie_id
 				}
 				this.$tools.Navigate.navigateTo('/pages-common/detail/index', obj)
 			},

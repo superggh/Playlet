@@ -64,20 +64,18 @@
 				<view class="w-100" style="height: 140rpx;"></view>
 			</view>
 		</m-scroll-y>
-		<!-- 	<view class="bottombox position-fixed bottom-0 left-0 p-2 w-100">
+			<view class="bottombox position-fixed bottom-0 left-0 p-2 w-100">
 			<u-button :hairline="false" loadingSize="16" :text="$t('付费')" :loading="req" @click="pay_with_paypal"
 				class="btons d-flex a-center j-center">
 			</u-button>
-		</view> -->
+		</view>
 		<u-toast ref="uToast"></u-toast>
 
-		<view class=" d-flex j-center" style="z-index:9999">
+		<view class="pay-box d-flex j-center" style="z-index:9999">
 			<div id="paypal-button"></div>
 
 		</view>
-
-		<!-- <script src="https://www.paypal.com/sdk/js?client-id=BAAWtTPwE6Wq45YE8yjnHjyFKmY44VRR84ZrlPe4NrjHmEVPT3YmiUyg2YcHldKIWGZ5-Ql4YR_9DKDOKs&components=hosted-buttons&disable-funding=venmo&currency=USD"></script> -->
-
+ 
 	</view>
 </template>
 
@@ -391,5 +389,10 @@
 				border-radius: 16rpx;
 			}
 		}
+	}
+	.pay-box{
+		position:absolute;
+		width:100%;
+		bottom:200rpx;
 	}
 </style>
